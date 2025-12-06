@@ -39,6 +39,39 @@ export type Database = {
         };
         Relationships: [];
       };
+      pokemon: {
+        Row: {
+          id: number;
+          Name: string;
+          Form: string | null;
+          Generation: number | null;
+          Value: number | null;
+          type: string;
+          sprite: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: number;
+          Name: string;
+          Form?: string | null;
+          Generation?: number | null;
+          Value?: number | null;
+          type: string;
+          sprite?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: number;
+          Name?: string;
+          Form?: string | null;
+          Generation?: number | null;
+          Value?: number | null;
+          type?: string;
+          sprite?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
