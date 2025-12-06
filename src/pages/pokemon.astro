@@ -1,0 +1,80 @@
+---
+import Alert from "../components/Alert.astro";
+import Layout from "../components/Layout.astro";
+import { supabase } from "../utils/database";
+
+export const prerender = false;
+
+type PokemonRow = {
+  Name: string;
+  Form: string | null;
+  Generation: number | null;
+  Value: number | null;
+};
+
+let pokemon: PokemonRow[] | null = null;
+let pokemonError: { code: string; message: string } | null = null;
+
+// Fetch top 10 Pokemon from Supabase if connection is set up
+if (supabase) {
+  const { data, error } = await supabase
+    .from("pokemon")
+    .select("Name, Form, Generation, Value")
+    .order("Name", { ascending: true })
+    .limit(10);
+  pokemon = data;
+  pokemonError = error;
+}
+---
+
+<Layout title="Pokemon">
+  {
+    supabase ? (
+      pokemon && pokemon.length > 0 ? (
+        <>
+          <h1 class="mb-8 text-4xl font-bold">Top 10 Pokemon</h1>
+          <table class="w-full text-left">
+            <thead>
+              <tr class="font-mono text-base border-t border-b border-neutral-600">
+                <th class="py-3">Name</th>
+                <th class="py-3">Form</th>
+                <th class="py-3">Generation</th>
+                <th class="py-3">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pokemon.map((p) => (
+                <tr class="border-b border-neutral-700 hover:bg-neutral-700/50 transition-colors">
+                  <td class="py-3 font-semibold capitalize">{p.Name}</td>
+                  <td class="py-3 capitalize">{p.Form ?? "-"}</td>
+                  <td class="py-3">{p.Generation ?? "-"}</td>
+                  <td class="py-3">{p.Value ?? "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      ) : (
+        <>
+          {pokemonError ? (
+            <Alert
+              title={pokemonError.code}
+              text={pokemonError.message}
+              variant="error"
+            />
+          ) : (
+            <Alert
+              title="No Pokemon found"
+              text="The pokemon table is empty. Please add some Pokemon to the database."
+            />
+          )}
+        </>
+      )
+    ) : (
+      <Alert
+        title="Database not connected"
+        text="Before viewing Pokemon, you must connect your Supabase database."
+      />
+    )
+  }
+</Layout>
